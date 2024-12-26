@@ -8,6 +8,7 @@ class CharactersTrieNode:
     """
     This class contains the node for each character of a certain word.
     """
+
     def __init__(self) -> None:
         # Initializes both children and flags if this is the end of the word.
         self.children = {}
@@ -20,6 +21,9 @@ class CharactersTrieNode:
         return self.end_of_word
 
 class TrieWords:
+    """
+    This class implements a Trie data structure to efficiently store words from a dictionary.
+    """
     def __init__(self) -> None:
         # Initializes the root of the data structure.
         self.root = CharactersTrieNode()
