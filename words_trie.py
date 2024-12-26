@@ -15,13 +15,8 @@ class CharactersTrieNode:
     
     def is_word_finished(self) -> bool:
         """
-        This method defines whether the sequence of characters, from root to
-        current node, is a word or not (determined if there exists a key '*' in the dictionary).
+        This method defines whether the sequence of characters, from root to current node, is a word or not.
         """
-        if('*' in self.children):
-            self.end_of_word = True
-        else:
-            self.end_of_word = False
         return self.end_of_word
 
 class TrieWords:
@@ -35,19 +30,16 @@ class TrieWords:
         """
         # If this is an empty str, there is no word to insert in the method. Otherwise, add the word to the dictionary.
         if not word:
-            return        
+            return
         cur_node = self.root
-        for char in word:
-            # Turn the character into lowercase so it becomes easier to search suggestions afterwards.
-            char = char.lower()
+        for char in word.lower(): # Converts to lowercase.
             # Adds the character to the children's dictionary and iterates over the children's nodes until it gets to the end of the word.
             if char not in cur_node.children:
                 cur_node.children[char] = CharactersTrieNode()
             cur_node = cur_node.children[char]
         
-        # Once the loop is finished, '*' is added to the children's dictionary.
-        cur_node.children['*'] = '*'
-        cur_node.is_word_finished()
+        # Flag this node to signalize this is a complete word.
+        cur_node.end_of_word = True
     
     def prefix_search(self, prefix: str) -> CharactersTrieNode:
         """
@@ -57,12 +49,10 @@ class TrieWords:
         Return: the node locating the last character in the prefix.
         """
         cur_node = self.root
-
         # Starts the search for the last node holding the last letter of prefix, then returns it at the end.
         for letter in prefix:
             if letter not in cur_node.children:
-                # Returns an empty list with no values.
-                return []
+                return None
             cur_node = cur_node.children[letter]
         return cur_node
     
@@ -71,12 +61,22 @@ class TrieWords:
         Finds the prefix in the Trie data structure and returns up to num_suggestions words from the dictionary.
         """
         # Initializes variables, and checks if the current node is a word.
-        cur_node = self.prefix_search(prefix)
+        cur_node = self.prefix_search(prefix.lower())
+        if cur_node is None:
+            return []
+        
         words_list = []
+        self._helper_give_suggestions(cur_node, prefix, words_list)
+        return words_list
+    
+    def _helper_give_suggestions(self, cur_node: CharactersTrieNode, prefix: str, words_list: list) -> None:
+        """
+        Helper method of give_suggestions(). Collects all the words that begin with the prefix str.
+        """
+        # Base case (whenever the word is finished).
         if cur_node.is_word_finished():
             words_list.append(prefix)
         
-        # Iterates over all the children from the current node, add each complete word to the list and returns the list.
+        # Recursive case, which will iterate over all the items of the children of each node.
         for letter, child in cur_node.children.items():
-            words_list.extend(self.give_suggestions(prefix + letter))
-        return words_list
+            self._helper_give_suggestions(child, prefix + letter, words_list)
