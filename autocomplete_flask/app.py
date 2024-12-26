@@ -4,33 +4,31 @@ Description: This file uses the Flask framework to implement a web application t
 Author: Andrey Estevam Seabra
 """
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, render_template, request
 import words_trie
 from nltk.corpus import wordnet as wn
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def home_page():
     """
-    This function renders and returns the HTML code in the templates directory.
+    This function renders the HTML code as well as accesses the suggestion of words based on user input.
     """
-    return render_template("index.html")
-
-@app.route("/autocomplete", methods=["POST"])
-def autocomplete():
-    # Accesses the prefix and number of suggestions the user wants.
-    prefix = request.form.get("prefix", "app") # Default prefix is "believe"
-    try:
-        num_suggestions = int(request.form.get("num_suggestions", 5)) # Default number of suggestions is 5.
-        if num_suggestions <= 0:
-            raise ValueError("The number of suggestions must be greater than zero.")
-    except ValueError:
-        return jsonify({"error": str(ValueError)}), 400 # Bad request error
+    suggestions_list = []
+    if request.method == "POST":
+        # Accesses the prefix and number of suggestions the user wants.
+        prefix = request.form.get("prefix", "app") # Default prefix is "believe"
+        try:
+            num_suggestions = int(request.form.get("num_suggestions", 5)) # Default number of suggestions is 5.
+            if num_suggestions <= 0:
+                raise ValueError("The number of suggestions must be greater than zero.")
+            # Accesses all the suggestions from the Trie and returns it 
+            suggestions_list = [suggestion.capitalize() for suggestion in word_dictionary.give_suggestions(prefix)[:num_suggestions]]
+        except ValueError:
+            suggestions_list = ["The number of suggestions must be greater than zero."]
     
-    # Accesses all the suggestions from the Trie and returns it 
-    suggestions_list = word_dictionary.give_suggestions(prefix)[:num_suggestions]
-    return jsonify(suggestions_list)
+    return render_template("index.html", suggestions=suggestions_list)
 
 
 # Loads the dictionary into a Trie data structure.
@@ -42,4 +40,4 @@ for word in words:
 print("Successfully loaded!")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

@@ -4,15 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Word Suggestions App</h1>
-    <form action="/autocomplete" method="post">
-        <label for="prefix">Please type an incomplete word:</label>
+    <h1 class="montserrat-title">Word Suggestions App</h1>
+    <form action="/" method="post">
+        <label for="prefix" class="montserrat-body">Please type an incomplete word:</label>
         <input type="text" id="prefix" name="prefix" value="app"><br>
-        <label for="num_suggestions">Please tell the maximum amount of suggestions you want:</label>
+        <label for="num_suggestions" class="montserrat-body">Please tell the maximum amount of suggestions you want:</label>
         <input type="number" id="num_suggestions" name="num_suggestions" value="5" min="1" required><br>
-        <button type="submit"> Get Suggestions</button>
+        <button type="submit" class="montserrat-title"> Get Suggestions</button>
     </form>
+
+    {% if suggestions %}
+        <h2>Suggestions:</h2>
+        <ul>
+            {% for suggestion in suggestions %}
+                <li>{{suggestion}}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </body>
 </html>
